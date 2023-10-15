@@ -1,3 +1,6 @@
+-- Some times the albumassets table changes name, e.g. it used to be
+-- Z_26ASSETS/Z_26ALBUMS, now it's 28.
+
 -- select ZDIRECTORY,ZFILENAME,* from ZASSET limit 100;
 
 select ZTITLE,(ZDIRECTORY||'/'||ZFILENAME) as ZPATH from ZGENERICALBUM albums
