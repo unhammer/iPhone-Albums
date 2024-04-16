@@ -2,4 +2,12 @@
 
 set -e -u -o pipefail
 
-sqlite3 -separator $'\t' Photos.sqlite < select.sql | awk 'BEGIN{OFS=FS="\t"} !$1 { $1="Untitled album" } $1 && $2 && NF==2'
+# arg1 is path to Photos.sqlite
+Photossqlite="$1"
+
+sqlite3 -separator $'\t' "${Photossqlite}" < select.sql | awk '
+BEGIN{OFS=FS="\t"}
+!$1 { $1="Untitled album" }
+{ gsub("/", "_", $1) }
+$1 && $2 && NF==2
+'

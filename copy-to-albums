@@ -4,13 +4,15 @@ set -e -u -o pipefail
 
 cd "$(dirname "$0")"
 
-# Path to the backup
-dcimpath=$1
+# arg1 is path to Photos.sqlite
+# arg2 is path to the backup (parent of DCIM folder)
+Photossqlite="$1"
+dcimpath=$2
 
-./make-file-list | while IFS=$'\t' read -r zalbum zpath; do
+./make-file-list "${Photossqlite}" | while IFS=$'\t' read -r zalbum zpath; do
     source="${dcimpath}/${zpath}"
     if [[ -f "${source}" ]]; then
-        # echo "PATH: '$zpath' → ALBUM: '$zalbum'"
+        echo "PATH: '$zpath' → ALBUM: '$zalbum'"
         dest="${dcimpath}/Albums/${zalbum}/"
         mkdir -p "${dest}"
         \cp --verbose --backup=numbered "${source}" "${dest}"
