@@ -6,17 +6,29 @@ cd "$(dirname "$0")"
 
 # arg1 is path to Photos.sqlite
 # arg2 is path to the backup (parent of DCIM folder)
+# arg3 (optional) is path to the mounted iPhone (parent of DCIM folder)
+#      e.g. /run/user/1000/gvfs/afc:host=00008030-00091DE23639802E
 Photossqlite="$1"
-dcimpath=$2
+backup_dcimpath="$2"
+phone_dcimpath="$3"
+
 
 ./make-file-list "${Photossqlite}" | while IFS=$'\t' read -r zalbum zpath; do
-    source="${dcimpath}/${zpath}"
-    if [[ -f "${source}" ]]; then
+    backup_source="${backup_dcimpath}/${zpath}"
+    phone_source="${phone_dcimpath}/${zpath}"
+    source=""
+    if [[ -f "${backup_source}" ]]; then
+        source="${backup_source}"
+    elif [[ -f "${phone_source}" ]]; then
+        source="${phone_source}"
+    else
+        echo "Couldn't find ${zpath} in backup ${backup_dcimpath} nor ${phone_dcimpath}" >&2
+        continue
+    fi
+    if [[ -n "${source}" ]]; then
         echo "PATH: '$zpath' → ALBUM: '$zalbum'"
-        dest="${dcimpath}/Albums/${zalbum}/"
+        dest="${backup_dcimpath}/Albums/${zalbum}/"
         mkdir -p "${dest}"
         \cp --verbose --backup=numbered "${source}" "${dest}"
-    else
-        echo "${source} does not exist"
     fi
 done
